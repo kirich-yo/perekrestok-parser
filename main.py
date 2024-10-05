@@ -4,9 +4,13 @@ import itertools
 import re
 import json
 import os
+import sys
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, Border, Side, NamedStyle
 from openpyxl.utils import get_column_letter
+from pyfiglet import Figlet
+from rich.console import Console
+from rich.progress import Progress
 
 
 CATALOG_SELECTOR = '#app > div > main > div > div > div > div.sc-dQoVA.bFTQaI.spinner-container-wrapper > div'
@@ -67,11 +71,10 @@ def mkdir_if_not_exists(a_dir):
         os.mkdir(a_dir)
 
 
-def download_images(items, dst_dir):
-    for id, item in enumerate(items):
-        response = requests.get(item['img'])
-        with open(os.path.join(dst_dir, f'{id}.jpg'), 'wb') as f:
-            f.write(response.content)
+def download_image(item, id, dst_dir):
+    response = requests.get(item['img'])
+    with open(os.path.join(dst_dir, f'{id}.jpg'), 'wb') as f:
+        f.write(response.content)
         
 
 
@@ -96,12 +99,46 @@ def parse_perekrestok(category):
 
 
 def main():
-    with open('Config.json') as f:
-        conf = dict(json.load(f))
-        parsed_items = parse_perekrestok(conf['category_link'])
-        save_to_xlsx(parsed_items)
+    if len(sys.argv) < 2:
+        print('Perekrestok Parser by kirich_yo')
+        print(f'Usage: {sys.argv[0]} [category]')
+        print(f'Example: {sys.argv[0]} /cat/c/658/deserty-i-sneki')
+        exit(1)
+
+    figlet = Figlet(font='slant')
+    print(figlet.renderText('PEREKRESTOK PARSER'))
+    console = Console()
+
+    try:
+        with console.status('Fetching data from the server: [cyan link {0}]{0}[/]'.format(f'https://www.perekrestok.ru{sys.argv[1]}')):
+            parsed_items = parse_perekrestok(sys.argv[1])
+            if (not len(parsed_items)):
+                console.print('[red bold]Failed to get all items. Try again later')
+                exit(1)
+        with console.status('Saving data to the Excel spreadsheet: [cyan]Goods.xlsx[/]'):
+            save_to_xlsx(parsed_items)
+
         mkdir_if_not_exists('Pictures')
-        download_images(parsed_items, 'Pictures')
+
+        with Progress() as progress:
+            count = 0
+            download_task = progress.add_task("Downloading all images...", total=len(parsed_items))
+            while not progress.finished:
+                download_image(parsed_items[count], count, 'Pictures')
+                progress.update(download_task, advance=1)
+                count += 1
+    except requests.exceptions.ConnectionError as e:
+        console.print(f'⛔ [red bold]An error occured while fetching data[/]: {str(e)}')
+        console.print('Check your connection.')
+        exit(1)
+    except KeyboardInterrupt:
+        console.print(f'✅ [green bold]Process aborted.')
+        exit(1)
+    except Exception as e:
+        console.print_exception()
+        exit(1)
+
+    console.print('✅ [green bold]All tasks done')
 
 
 if __name__ == '__main__':
