@@ -8,7 +8,7 @@
 
 ## Необходимые модули
 
-requests, BeautifulSoup, openpyxl
+requests, BeautifulSoup, openpyxl, pyfiglet, rich
 
 Их можно установить, выполнив следующие команды:
 
@@ -16,4 +16,6 @@ requests, BeautifulSoup, openpyxl
 pip install requests
 pip install beautifulsoup4
 pip install openpyxl
+pip install pyfiglet
+pip install rich
 ```
