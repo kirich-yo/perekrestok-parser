@@ -3,6 +3,7 @@
 
 ## Вывод парсера
 
+![Процесс парсинга](https://github.com/kirich-yo/perekrestok-parser/blob/master/res/screenshots/3.gif)
 ![Таблица Excel](https://github.com/kirich-yo/perekrestok-parser/blob/master/res/screenshots/1.jpg)
 ![Фото товаров](https://github.com/kirich-yo/perekrestok-parser/blob/master/res/screenshots/2.jpg)
 
