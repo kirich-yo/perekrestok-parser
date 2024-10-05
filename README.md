@@ -9,6 +9,8 @@
 
 В случае успешного завершения программа сохраняет все полученные и обработанные данные в Excel-таблицу со списком всех товаров и соответствующие им изображения в отдельную директорию.
 
+![Выходные данные](https://github.com/kirich-yo/perekrestok-parser/blob/master/res/screenshots/5.png)
+
 ## Процесс парсинга
 
 ![Процесс парсинга](https://github.com/kirich-yo/perekrestok-parser/blob/master/res/screenshots/3.gif)
